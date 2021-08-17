@@ -18,6 +18,7 @@ package org.apache.rocketmq.example.simple;
 
 import java.util.List;
 import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
+import org.apache.rocketmq.client.consumer.store.OffsetStore;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import org.apache.rocketmq.common.message.MessageExt;
 
@@ -27,6 +28,7 @@ public class LitePullConsumerSubscribe {
 
     public static void main(String[] args) throws Exception {
         DefaultLitePullConsumer litePullConsumer = new DefaultLitePullConsumer("lite_pull_consumer_test");
+        litePullConsumer.setNamesrvAddr("127.0.0.1:9876");
         litePullConsumer.setConsumeFromWhere(ConsumeFromWhere.CONSUME_FROM_FIRST_OFFSET);
         litePullConsumer.subscribe("TopicTest", "*");
         litePullConsumer.start();
@@ -34,6 +36,9 @@ public class LitePullConsumerSubscribe {
             while (running) {
                 List<MessageExt> messageExts = litePullConsumer.poll();
                 System.out.printf("%s%n", messageExts);
+                for (MessageExt msg: messageExts) {
+                    System.out.printf("msgBody:%s%n", new String(msg.getBody()));
+                }
             }
         } finally {
             litePullConsumer.shutdown();
